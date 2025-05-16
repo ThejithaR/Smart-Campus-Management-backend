@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers.main import router as main_router
 
 app = FastAPI(
     title="Smart Campus Management API",
@@ -15,6 +16,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include main router
+app.include_router(main_router)
 
 @app.get("/")
 async def root():
