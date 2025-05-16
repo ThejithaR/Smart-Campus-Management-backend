@@ -1,0 +1,20 @@
+# Ignore virtual environment
+rasa_env/
+
+# Ignore Rasa generated model files and logs
+.rasa/
+
+# Ignore credentials if sensitive (or use an example with placeholder values)
+credentials.yml
+
+# Ignore environment files or other config files that may contain secrets
+.env
+
+# Ignore Python cache files
+__pycache__/
+
+# Ignore any IDE-specific files (if applicable)
+.vscode/
+
+# Ignore trained Rasa models
+models/

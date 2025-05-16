@@ -1,0 +1,151 @@
+version: "3.1"
+
+nlu:
+
+- intent: out_of_scope
+  examples: |
+    # ---------- out_of_scope ----------
+    - What is the weather today?
+    - Tell me a joke
+    - How do I bake a cake?
+    - What's the price of Bitcoin?
+    - Who won the cricket match yesterday?
+    - Can you sing a song?
+    - What is the population of Sri Lanka?
+    - Show me nearby restaurants
+
+- intent: greet
+  examples: |
+    # ---------- greet ----------
+    - hi
+    - hello
+    - good morning
+    - hey
+    - good evening
+    - hey there
+    - howdy
+    - hi there
+
+- intent: ask_exam_schedule
+  examples: |
+    # ---------- ask_exam_schedule ----------
+    - when is the exam for [CS101](course_code)?
+    - show me the exam details for [EE201](course_code)
+    - tell me the exam schedule of [MA203](course_code)
+    - exam time for [IS202](course_code)
+    - when is [CS301](course_code) exam?
+    - what time is [EE105](course_code) exam?
+    - give me the exam date for [IS202](course_code)
+    - I want to know when the [MA203](course_code) exam is
+
+- intent: schedule_exam
+  examples: |
+    # ---------- schedule_exam ----------
+    - schedule [mid exam](exam_title) for [CS101](course_code) on [2023-12-01](date) from [10:00 AM](start_time) to [12:00 PM](end_time) in the [main hall](location)
+    - set the [exam](exam_title) for [EE201](course_code) on [2023-12-05](date) starting at [2:00 PM](start_time) and ending at [3:00 PM](end_time) in the [auditorium](location)
+    - arrange [final exam](exam_title) for [MA203](course_code) on [2023-12-10](date) [9:00](start_time)-[11:00](end_time) at the [lecture hall](location)
+    - book [midterm exam](exam_title) for [IS202](course_code) on [2023-12-15](date) [11:00](start_time) to [13:00](end_time) in the [conference room](location)
+    - please schedule [quiz 1](exam_title) for [CS301](course_code) on [2023-12-20](date) from [8:00 AM](start_time) to [9:00 AM](end_time) at the [exam center](location)
+    - I want to set [final exam](exam_title) for [EE105](course_code) on [2023-12-18](date) between [1:00](start_time) and [4:00](end_time) in the [exam hall](location)
+
+- intent: ask_assignments
+  examples: |
+    # ---------- ask_assignments ----------
+    - what assignments do I have for [CS102](course_code)?
+    - any pending work for [MA203](course_code)?
+    - do I have any assignments in [EE105](course_code)?
+    - show my assignments for [CS301](course_code)
+    - list my assignments for [IS202](course_code)
+    - what are my assignments for [CS102](course_code)?
+    - do I have any assignments in [MA203](course_code)?
+    - show pending assignments for [CS101](course_code)
+    - give me my assignments for [IS202](course_code)
+
+- intent: get_profile
+  examples: |
+    # ---------- get_profile ----------
+    - show my profile
+    - view my personal information
+    - what is in my student profile?
+    - show my details
+    - tell me about my profile
+    - give me my profile information
+    - can you show my profile?
+    - display my profile details
+
+- intent: update_profile
+  examples: |
+    # ---------- name ----------
+    - set my [name](attribute) as [Aadiththiyan](new_value)
+    - update my [name](attribute) to [Aadiththiyan](new_value)
+    - change my [name](attribute) into [Aadiththiyan](new_value)
+    - I want to update my [name](attribute) to [A. Aadith](new_value)
+    - please update my [name](attribute) as [Aadith S](new_value)
+    - can you set my [name](attribute) as [A. Aadith](new_value)
+    - I would like to change my [name](attribute) to [A. Aadith](new_value)
+    - I need to update my [name](attribute) as [A. Aadith](new_value)
+
+    # ---------- faculty ----------
+    - update my [faculty](attribute) to [Engineering](new_value)
+    - change my [faculty](attribute) into [Faculty of Engineering](new_value)
+    - set my [faculty](attribute) as [Engineering](new_value)
+    - I want to update my [faculty](attribute) to [Engineering](new_value)
+    - update my [faculty](attribute) to [Applied Sciences](new_value)
+    - change my [faculty](attribute) to [Management](new_value)
+    - set my [faculty](attribute) as [Fashion Designing](new_value)
+
+    # ---------- department ----------
+    - change my [department](attribute) to [Computer Science](new_value)
+    - update my [department](attribute) to [Information Technology](new_value)
+    - set my [department](attribute) as [Electrical Engineering](new_value)
+    - I want to update my [department](attribute) to [Software Engineering](new_value)
+    - change my [department](attribute) into [Mechanical Engineering](new_value)
+    - update my [department](attribute) to [Civil Engineering](new_value)
+    - can you change my [department](attribute) to [Fashion Design](new_value)
+
+    # ---------- year_of_study ----------
+    - change my [year_of_study](attribute) to [3](new_value)
+    - update my [year_of_study](attribute) to [2](new_value)
+    - I want to set my [year_of_study](attribute) as [4](new_value)
+    - please change my [year_of_study](attribute) into [1](new_value)
+    - can you update my [year_of_study](attribute) to [3](new_value)
+    - I need to change my [year_of_study](attribute) to [2](new_value)
+
+    # ---------- semester ----------
+    - update my [semester](attribute) to [2](new_value)
+    - change my [semester](attribute) into [1](new_value)
+    - set my [semester](attribute) as [2](new_value)
+    - I want to update my [semester](attribute) to [1](new_value)
+    - please update my [semester](attribute) as [2](new_value)
+    - can you set my [semester](attribute) as [1](new_value)
+
+    # ---------- designation ----------
+    - set my [designation](attribute) as [Senior Lecturer](new_value)
+    - update my [designation](attribute) to [Professor](new_value)
+    - I want to change my [designation](attribute) to [Lecturer](new_value)
+    - please update my [designation](attribute) as [Assistant Professor](new_value)
+    - can you change my [designation](attribute) to [Head of Department](new_value)
+    - change my [designation](attribute) into [Research Assistant](new_value)
+
+- intent: schedule_assignment
+  examples: |
+    # ---------- schedule_assignment ----------
+    - I want to schedule an assignment for [CS102](course_code)
+    - Schedule an assignment titled [Lab Report 1](assignment_title) for [MA203](course_code)
+    - I want to assign [Project Proposal](assignment_title) in [CS301](course_code)
+    - Please schedule an assignment with title [Homework 3](assignment_title) and description [Solve problems 1 to 5 from Chapter 4](assignment_description)
+    - The attachment URL is [http://example.com/file.pdf](attachment_url)
+    - The due date is [2025-05-15](due_date) and time is [14:30](due_time)
+    - assign an assignment called [Essay](assignment_title) for [EE201](course_code)
+    - create [Assignment 2](assignment_title) in [IS202](course_code) with due date [2025-06-01](due_date)
+
+- intent: goodbye
+  examples: |
+    # ---------- goodbye ----------
+    - bye
+    - see you later
+    - goodbye
+    - talk to you later
+    - catch you later
+    - farewell
+    - have a nice day

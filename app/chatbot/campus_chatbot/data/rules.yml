@@ -1,0 +1,63 @@
+version: "3.1"
+
+rules:
+
+- rule: Handle out-of-scope queries
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Provide exam schedule when asked
+  steps:
+  - intent: ask_exam_schedule
+  - action: action_get_exam_schedule
+
+- rule: Update exam schedule when asked
+  steps:
+  - intent: schedule_exam
+  - action: action_schedule_exam
+
+- rule: Update profile attribute when requested
+  steps:
+  - intent: update_profile
+  - action: action_update_profile
+
+- rule: Show profile when requested
+  steps:
+  - intent: get_profile
+  - action: action_get_profile
+
+- rule: Fallback when the bot doesn’t understand
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default
+
+- rule: Get assignments when user asks
+  steps:
+    - intent: ask_assignments
+    - action: action_get_assignments
+
+- rule: Schedule assignment form
+  steps:
+    - intent: schedule_assignment
+    - action: schedule_assignment_form
+    - active_loop: schedule_assignment_form
+
+- rule: Submit assignment scheduling
+  condition:
+    - active_loop: schedule_assignment_form
+  steps:
+    - action: schedule_assignment_form
+    - active_loop: null
+    - action: action_schedule_assignment  # this is your submit action
+

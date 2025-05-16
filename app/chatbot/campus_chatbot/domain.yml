@@ -1,0 +1,227 @@
+version: "3.1"
+
+intents:
+  - greet
+  - ask_exam_schedule
+  - ask_assignments
+  - get_profile
+  - update_contact
+  - goodbye
+  - bot_challenge
+  - schedule_exam
+  - update_profile    # <-- NEW
+  - schedule_assignment
+
+entities:
+  - course_code
+  - date
+  - start_time
+  - end_time
+  - location
+  - exam_title
+  - contact_number
+  - user_reg_number
+  - user_role
+  - attribute          # <-- NEW
+  - new_value          # <-- NEW
+  - assignment_title
+  - assignment_description
+  - attachment_url
+  - due_date
+  - due_time
+
+slots:
+  course_code:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: course_code
+    # influence_conversation: false
+
+  date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: date
+
+  contact_number:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: contact_number
+
+  user_reg_number:
+    type: text
+    mappings:
+      - type: custom
+
+  user_role:
+    type: text
+    mappings:
+      - type: custom
+
+  exam_date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: date
+
+  exam_start_time:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: start_time
+
+  exam_end_time:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: end_time
+
+  exam_location:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: location
+
+  exam_title:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: exam_title
+
+  attribute:              # <-- NEW
+    type: text
+    mappings:
+      - type: from_entity
+        entity: attribute
+
+  new_value:              # <-- NEW
+    type: text
+    mappings:
+      - type: from_entity
+        entity: new_value
+      - type: from_text
+
+  metadata:
+    type: any
+    mappings:
+      - type: custom
+
+  assignment_title:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: assignment_title
+    # influence_conversation: false
+
+  assignment_description:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: assignment_description
+    # influence_conversation: false
+
+  attachment_url:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: attachment_url
+    # influence_conversation: false
+
+  due_date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: due_date
+    # influence_conversation: false
+
+  due_time:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: due_time
+    # influence_conversation: false
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I assist you with your campus details?"
+
+  utter_goodbye:
+    - text: "Goodbye! Have a great day."
+
+  utter_ask_course_code:
+    - text: "Which course are you referring to?"
+
+  utter_update_success:
+    - text: "Your contact information has been updated."
+
+  utter_iamabot:
+    - text: "I am a Rasa-powered bot, here to help you!"
+
+  utter_default:
+    - text: "I am a campus bot. Please ask me what you want to do regarding that."
+
+  utter_show_profile:
+    - text: "Here is your profile information."
+
+  utter_ask_assignment_details:
+    - text: "Please specify the course code to check assignments."
+
+  utter_profile_update_success:      # <-- NEW
+    - text: "Your profile information has been updated successfully."
+
+  utter_out_of_scope:
+    - text: "I'm here to assist only with faculty management-related tasks. Please ask something related to exams, attendance, or profiles."
+
+  # utter_ask_course_code:
+  #   - text: "Please specify the course code."
+  utter_ask_assignment_title:
+    - text: "What is the title of the assignment?"
+
+  utter_ask_assignment_description:
+    - text: "Please provide a brief description of the assignment."
+
+  utter_ask_attachment_url:
+    - text: "Please share the attachment URL for the assignment (if any)."
+
+  utter_ask_due_date:
+    - text: "What is the due date for the assignment? (YYYY-MM-DD)"
+
+  utter_ask_due_time:
+    - text: "What is the due time for the assignment? (HH:MM)"
+
+  utter_schedule_assignment_confirmation:
+    - text: |
+        Thanks! Here are the details of your assignment:
+        📘 Course Code: {course_code}
+        📝 Title: {assignment_title}
+        🖊 Description: {assignment_description}
+        📎 Attachment: {attachment_url}
+        📅 Due Date: {due_date}
+        ⏰ Due Time: {due_time}
+        Your assignment has been scheduled successfully
+
+forms:
+  schedule_assignment_form:
+    required_slots:
+      - course_code
+      - assignment_title
+      - assignment_description
+      - attachment_url
+      - due_date
+      - due_time
+
+
+actions:
+  - action_get_exam_schedule
+  - action_update_contact
+  - action_get_assignments
+  - action_get_profile
+  - action_schedule_exam
+  - action_update_profile            # <-- NEW
+  - action_schedule_assignment
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

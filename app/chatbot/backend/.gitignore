@@ -1,0 +1,25 @@
+# Node modules - never commit these
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Optional: coverage reports or build artifacts
+coverage/
+dist/
+build/
