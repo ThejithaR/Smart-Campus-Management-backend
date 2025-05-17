@@ -125,6 +125,18 @@ services:
     networks:
       - smart-campus-network
 
+  resource-management: # Add the new resource-management service
+    build:
+      context: ./app/resource-management
+    environment:
+      - RABBITMQ_HOST=rabbitmq # Include RabbitMQ host if needed
+    ports:
+      - "8010:8000" # Map host port 8010 to container port 8000
+    depends_on:
+      - rabbitmq # Depends on rabbitmq
+    networks:
+      - smart-campus-network
+
 networks:
   smart-campus-network:
     driver: bridge
