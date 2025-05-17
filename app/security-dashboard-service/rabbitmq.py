@@ -1,91 +1,101 @@
-# rabbitmq.py
 import pika
 import json
-import os  # Import the os module
+import os
 from manual_approvals import add_vehicle
-# You might have other imports here
+import time
 
 # Define the RabbitMQ host using an environment variable, defaulting to 'rabbitmq'
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq')
+RETRY_ATTEMPTS = 10
+RETRY_DELAY = 5
 
 def get_connection():
-    """Helper function to establish RabbitMQ connection with basic error handling."""
-    try:
-        # Use the defined RABBITMQ_HOST instead of "localhost"
-        print(f"Attempting to connect to RabbitMQ at {RABBITMQ_HOST}")
-        connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
-        print("Successfully connected to RabbitMQ.")
-        return connection
-    except pika.exceptions.AMQPConnectionError as e:
-        print(f"Failed to connect to RabbitMQ at {RABBITMQ_HOST}: {str(e)}")
-        # Depending on how critical the connection is, you might want to
-        # exit, retry, or just return None and handle it in calling functions.
-        # For now, we'll print and return None or raise. Let's raise for clarity.
-        raise # Re-raise the exception after printing for easier debugging
+    """Helper function to establish RabbitMQ connection with retries."""
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            print(f"Attempt {attempt + 1}/{RETRY_ATTEMPTS}: Connecting to RabbitMQ at {RABBITMQ_HOST}")
+            
+            # Configure connection parameters for Docker networking
+            credentials = pika.PlainCredentials('guest', 'guest')
+            parameters = pika.ConnectionParameters(
+                host=RABBITMQ_HOST,
+                port=5672,
+                virtual_host='/',
+                credentials=credentials,
+                heartbeat=600,  # 10 minutes
+                blocked_connection_timeout=300,
+                connection_attempts=3,
+                retry_delay=5,
+                socket_timeout=5
+            )
+            
+            connection = pika.BlockingConnection(parameters)
+            print("Successfully connected to RabbitMQ.")
+            return connection
+        except pika.exceptions.AMQPConnectionError as e:
+            print(f"Attempt {attempt + 1}/{RETRY_ATTEMPTS}: Failed to connect to RabbitMQ at {RABBITMQ_HOST}: {str(e)}")
+            if attempt < RETRY_ATTEMPTS - 1:
+                print(f"Retrying in {RETRY_DELAY} seconds...")
+                time.sleep(RETRY_DELAY)
+            else:
+                print("Max retry attempts reached. Could not establish initial connection to RabbitMQ.")
+                raise
 
 def consume_manual_approvals():
-    connection = None # Initialize connection to None
+    while True:  # Keep trying to reconnect if connection is lost
+        connection = None
+        try:
+            connection = get_connection()
+            if not connection:
+                print("Could not start manual approvals consumer due to connection failure.")
+                time.sleep(RETRY_DELAY)
+                continue
+
+            channel = connection.channel()
+            channel.queue_declare(queue="manual_approval_requests", durable=True)
+
+            def callback(ch, method, properties, body):
+                message = json.loads(body)
+                print(f"[x] Received manual approval request: {message}")
+                try:
+                    add_vehicle(message)
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                except Exception as e:
+                    print(f"Error processing message {message}: {str(e)}")
+                    ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+
+            channel.basic_consume(queue="manual_approval_requests", on_message_callback=callback)
+            print(" [*] Waiting for manual approval requests...")
+            channel.start_consuming()
+
+        except pika.exceptions.ConnectionClosedByBroker:
+            print("RabbitMQ connection closed by broker. Attempting to reconnect...")
+            time.sleep(RETRY_DELAY)
+            continue
+        except pika.exceptions.AMQPChannelError as e:
+            print(f"AMQP Channel Error: {e}")
+            time.sleep(RETRY_DELAY)
+            continue
+        except pika.exceptions.AMQPConnectionError as e:
+            print(f"AMQP Connection Error: {e}")
+            time.sleep(RETRY_DELAY)
+            continue
+        except Exception as e:
+            print(f"An unexpected error occurred: {str(e)}")
+            time.sleep(RETRY_DELAY)
+            continue
+
+def send_manual_approval(vehicle):
+    connection = None
     try:
         connection = get_connection()
         if not connection:
-            # get_connection already prints an error, just return
+            print("Could not send manual approval due to connection failure.")
             return
 
         channel = connection.channel()
-        channel.queue_declare(queue="manual_approval_requests", durable=True)
-
-        def callback(ch, method, properties, body):
-            message = json.loads(body)
-            print(f"[x] Received manual approval request: {message}")
-            try:
-                add_vehicle(message) # Make sure add_vehicle handles potential errors
-                ch.basic_ack(delivery_tag=method.delivery_tag)
-            except Exception as e:
-                print(f"Error processing message {message}: {str(e)}")
-                # Optionally Nack the message if processing failed and you want it redelivered
-                # ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-                pass # Or handle the error appropriately
-
-
-        channel.basic_consume(queue="manual_approval_requests", on_message_callback=callback)
-        print(" [*] Waiting for manual approval requests. To exit press CTRL+C")
-        channel.start_consuming()
-    except pika.exceptions.ConnectionClosedByBroker:
-        print("RabbitMQ connection closed by broker. Reconnecting...")
-        # Implement reconnection logic here if needed
-    except pika.exceptions.AMQPChannelError as e:
-         print(f"AMQP Channel Error: {e}")
-         # Handle channel errors (e.g., queue gone)
-    except pika.exceptions.AMQPConnectionError as e:
-         print(f"AMQP Connection Error: {e}")
-         # Handle connection errors (e.g., RabbitMQ down)
-    except Exception as e:
-        print(f"An unexpected error occurred in consume_manual_approvals: {str(e)}")
-        # Consider if you need to stop consuming or just log
-    finally:
-        # Ensure connection is closed if it was successfully opened
-        if connection and not connection.is_closed:
-            try:
-                connection.close()
-                print("RabbitMQ connection closed.")
-            except Exception as e:
-                print(f"Error closing connection: {str(e)}")
-
-
-def send_manual_approval(vehicle):
-    connection = None # Initialize connection to None
-    try:
-        connection = get_connection()
-        if not connection:
-             # get_connection already prints an error, just return
-             print("Could not send manual approval due to connection failure.")
-             return
-
-        channel = connection.channel()
-
         channel.queue_declare(queue="vehicle.authorization.result", durable=True)
 
-        # Manually approve the vehicle
         message = {
             "plate_number": vehicle["plate_number"],
             "status": "manually approved",
@@ -97,18 +107,12 @@ def send_manual_approval(vehicle):
             exchange="",
             routing_key="vehicle.authorization.result",
             body=json.dumps(message),
-            properties=pika.BasicProperties(delivery_mode=2)
+            properties=pika.BasicProperties(
+                delivery_mode=2,  # make message persistent
+                content_type='application/json'
+            )
         )
         print(f" [x] Sent manual approval result: {message}")
-    except pika.exceptions.AMQPConnectionError as e:
-         print(f"AMQP Connection Error sending manual approval: {e}")
     except Exception as e:
         print(f"Error sending manual approval message: {str(e)}")
-    finally:
-        # Ensure connection is closed if it was successfully opened
-        if connection and not connection.is_closed:
-            try:
-                connection.close()
-                print("RabbitMQ connection closed after sending manual approval.")
-            except Exception as e:
-                 print(f"Error closing connection after sending manual approval: {str(e)}")
+        raise
