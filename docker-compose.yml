@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # RabbitMQ default port
+      - "15672:15672" # RabbitMQ management UI
+    networks:
+      - smart-campus-network
+
+  vehicle-detector:
+    build: 
+      context: ./app/vehicle-detector
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8001:8000"
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
+
+  authorization-service:
+    build: 
+      context: ./app/authorization-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8002:8000"
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
+
+  logger-service:
+    build: 
+      context: ./app/logger-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8003:8000"
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
+
+  security-dashboard-service:
+    build: 
+      context: ./app/security-dashboard-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8004:8000"
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
+
+networks:
+  smart-campus-network:
+    driver: bridge
