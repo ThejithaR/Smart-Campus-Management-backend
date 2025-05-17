@@ -4,6 +4,8 @@ from app.rabbitmq.consumer import consume
 
 app = FastAPI()
 
+print("Starting FastAPI service...")
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(consume())
