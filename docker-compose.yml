@@ -14,6 +14,19 @@ services:
       timeout: 10s
       retries: 5
 
+  api-gateway: # Add the new api-gateway service
+    build:
+      context: ./app/api-gateway
+    environment:
+      - RABBITMQ_HOST=rabbitmq # Include RabbitMQ host in case the gateway needs it
+    ports:
+      - "8000:8000" # Map host port 8009 to container port 8000 (assuming internal port is 8000)
+    depends_on:
+      - rabbitmq # Depend on rabbitmq
+      # You might also want to add dependencies on other services the gateway routes to
+    networks:
+      - smart-campus-network
+
   vehicle-detector:
     build: 
       context: ./app/vehicle-detector
@@ -74,31 +87,43 @@ services:
     networks:
       - smart-campus-network
 
-  # notifications-service: # Add the new notifications service
-  #   build:
-  #     context: ./app/notifications
-  #   environment:
-  #     - RABBITMQ_HOST=rabbitmq
-  #   ports:
-  #     - "8007:8000" # Map host port 8007 to container port 8000
-  #   depends_on:
-  #     - rabbitmq
-  #   networks:
-  #     - smart-campus-network
+  notifications-service: # Add the new notifications service
+    build:
+      context: ./app/notifications
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8007:8000" # Map host port 8007 to container port 8000
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Add this line
 
-  # attendance-service: # Add the new attendance service
-  #   build:
-  #     context: ./app/attendance
-  #   environment:
-  #     - RABBITMQ_HOST=rabbitmq
-  #   ports:
-  #     - "8006:8000" # Map host port 8006 to container port 4000
-  #   depends_on:
-  #     - rabbitmq
-  #   networks:
-  #     - smart-campus-network
+    networks:
+      - smart-campus-network
 
+  attendance-service: # Add the new attendance service
+    build:
+      context: ./app/attendance
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8006:8000" # Map host port 8006 to container port 4000
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
 
+  schedule-manager: # Add the new schedule-manager service
+    build:
+      context: ./app/schedule-manager
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8008:8000" # Map host port 8008 to container port 8000
+    depends_on:
+      - rabbitmq # Depends on rabbitmq
+    networks:
+      - smart-campus-network
 
 networks:
   smart-campus-network:

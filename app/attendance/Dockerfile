@@ -1,6 +1,9 @@
 FROM python:3.10-slim
 
-# Install minimal dependencies for dlib and face_recognition
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -16,19 +19,18 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
-
-# Copy dependency list and install Python packages
+# Copy requirements file
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt && \
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt && \
     pip install opencv-python-headless
 
-# Copy the application code
+# Copy the service code
 COPY . .
 
-# Expose FastAPI port
-EXPOSE 4000
+# Expose the port the app runs on
+EXPOSE 8000
 
-# Run FastAPI server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "4000"]
+# Command to run the service
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

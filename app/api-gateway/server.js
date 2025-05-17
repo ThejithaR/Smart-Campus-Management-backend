@@ -14,12 +14,12 @@ import notificationRouter from "./routes/notificationRoutes.js";
 
 
 const app = express(); // initializing express app
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8000;
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/realtime/face-recognition' });
 
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["**"];
 
 app.use(express.json());
 app.use(cookieParser());

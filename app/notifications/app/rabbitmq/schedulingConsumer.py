@@ -3,9 +3,10 @@ import aio_pika
 import json
 from app.config import RABBITMQ_URL, SCHEDULING_NOTIFICATIONS_QUEUE
 from app.controllers.notification_controller import handle_message
+from .connection import get_connection
 
 async def consume_scheduling_messages():
-    connection = await aio_pika.connect_robust(RABBITMQ_URL)
+    connection = await get_connection()
     channel = await connection.channel()
     queue = await channel.declare_queue(SCHEDULING_NOTIFICATIONS_QUEUE, durable=True)
     print("✅ Scheduling Consumer started...")
