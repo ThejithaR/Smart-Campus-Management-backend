@@ -1,4 +1,4 @@
-RABBITMQ_URL = "amqp://admin:admin@localhost:5672/"
+RABBITMQ_URL = "amqp://guest:guest@rabbitmq:5672/"
 COURSES_QUEUE = "courses_queue"
 REPLY_QUEUE = "courses_queue_response"
 

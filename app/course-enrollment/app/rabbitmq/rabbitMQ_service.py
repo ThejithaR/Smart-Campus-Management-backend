@@ -5,14 +5,46 @@ import aio_pika
 from aio_pika import Message, connect_robust
 from aio_pika.abc import AbstractChannel, AbstractConnection
 from app.config import RABBITMQ_URL
+import os
+
+# Define retry parameters
+RETRY_ATTEMPTS = 10
+RETRY_DELAY = 5
 
 connection: AbstractConnection = None
 channel: AbstractChannel = None
 
 async def initialize_rabbitmq():
     global connection, channel
-    connection = await connect_robust(RABBITMQ_URL)
-    channel = await connection.channel()
+    
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            print(f"Attempt {attempt + 1}/{RETRY_ATTEMPTS}: Connecting to RabbitMQ...")
+            
+            # Configure connection parameters
+            connection = await connect_robust(
+                RABBITMQ_URL,
+                timeout=5,
+                reconnect_interval=5,
+                connection_attempts=3
+            )
+            
+            channel = await connection.channel()
+            
+            # Set QoS prefetch count
+            await channel.set_qos(prefetch_count=1)
+            
+            print("Successfully connected to RabbitMQ.")
+            return
+            
+        except Exception as e:
+            print(f"Attempt {attempt + 1}/{RETRY_ATTEMPTS}: Failed to connect to RabbitMQ: {str(e)}")
+            if attempt < RETRY_ATTEMPTS - 1:
+                print(f"Retrying in {RETRY_DELAY} seconds...")
+                await asyncio.sleep(RETRY_DELAY)
+            else:
+                print("Max retry attempts reached. Could not establish initial connection to RabbitMQ.")
+                raise
 
 # Call once on app startup
 asyncio.create_task(initialize_rabbitmq())

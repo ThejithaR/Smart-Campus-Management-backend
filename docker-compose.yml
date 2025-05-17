@@ -62,6 +62,44 @@ services:
     networks:
       - smart-campus-network
 
+  course-enrollment:
+    build: 
+      context: ./app/course-enrollment
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    ports:
+      - "8005:8000"
+    depends_on:
+      - rabbitmq
+    networks:
+      - smart-campus-network
+
+  # notifications-service: # Add the new notifications service
+  #   build:
+  #     context: ./app/notifications
+  #   environment:
+  #     - RABBITMQ_HOST=rabbitmq
+  #   ports:
+  #     - "8007:8000" # Map host port 8007 to container port 8000
+  #   depends_on:
+  #     - rabbitmq
+  #   networks:
+  #     - smart-campus-network
+
+  # attendance-service: # Add the new attendance service
+  #   build:
+  #     context: ./app/attendance
+  #   environment:
+  #     - RABBITMQ_HOST=rabbitmq
+  #   ports:
+  #     - "8006:8000" # Map host port 8006 to container port 4000
+  #   depends_on:
+  #     - rabbitmq
+  #   networks:
+  #     - smart-campus-network
+
+
+
 networks:
   smart-campus-network:
     driver: bridge
