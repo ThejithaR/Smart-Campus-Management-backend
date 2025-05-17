@@ -42,7 +42,7 @@ rasa_env/
 .rasa/
 
 # Ignore trained Rasa models
-models/
+# models/
 
 # Conda
 .conda/
