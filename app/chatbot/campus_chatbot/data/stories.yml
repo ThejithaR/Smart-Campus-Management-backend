@@ -1,0 +1,68 @@
+version: "3.1"
+
+stories:
+
+- story: User says something out of scope
+  steps:
+    - intent: out_of_scope
+    - action: utter_out_of_scope
+
+- story: greet and ask exam
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_exam_schedule
+    - action: action_get_exam_schedule
+
+- story: ask exam schedule directly
+  steps:
+    - intent: ask_exam_schedule
+    - action: action_get_exam_schedule
+
+- story: update exam schedule
+  steps:
+    - intent: schedule_exam
+    - action: action_schedule_exam
+
+- story: update profile
+  steps:
+    - intent: update_profile
+    - action: action_update_profile
+
+- story: view profile
+  steps:
+    - intent: get_profile
+    - action: action_get_profile
+
+- story: greet and view profile
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: get_profile
+    - action: action_get_profile
+
+- story: get assignments for a course
+  steps:
+    - intent: ask_assignments
+      entities:
+        - course_code: CS102
+    - action: action_get_assignments
+
+- story: faculty schedules assignment
+  steps:
+    - intent: schedule_assignment
+      entities:
+        - course_code: CS102
+        - assignment_title: Homework 3
+        - assignment_description: Solve problems 1 to 5 from Chapter 4
+        - attachment_url: http://example.com/file.pdf
+        - due_date: 2025-05-15
+        - due_time: 14:30
+    - action: schedule_assignment_form
+    - active_loop: schedule_assignment_form
+
+- story: submit scheduled assignment
+  steps:
+    - action: schedule_assignment_form
+    - active_loop: null
+    - action: action_schedule_assignment
