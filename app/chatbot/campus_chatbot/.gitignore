@@ -1,5 +1,6 @@
 # Ignore virtual environment
 rasa_env/
+rasa_venv/
 
 # Ignore Rasa generated model files and logs
 .rasa/
