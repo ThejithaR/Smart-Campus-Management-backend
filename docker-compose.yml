@@ -18,7 +18,7 @@ services:
     build:
       context: ./app/api-gateway
     environment:
-      - RABBITMQ_HOST=rabbitmq # Include RabbitMQ host in case the gateway needs it
+      - RABBITMQ_HOST=rabbitmq 
     ports:
       - "8000:8000" # Map host port 8009 to container port 8000 (assuming internal port is 8000)
     depends_on:
@@ -44,6 +44,8 @@ services:
       context: ./app/vehicle-detector
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL3}
+      - SUPABASE_KEY=${SUPABASE_KEY3}
     ports:
       - "8001:8000"
     depends_on:
@@ -55,7 +57,9 @@ services:
     build: 
       context: ./app/authorization-service
     environment:
-      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_HOST=rabbitmq,
+      - SUPABASE_URL=${SUPABASE_URL3}
+      - SUPABASE_KEY=${SUPABASE_KEY3}
     ports:
       - "8002:8000"
     depends_on:
@@ -68,6 +72,8 @@ services:
       context: ./app/logger-service
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL3}
+      - SUPABASE_KEY=${SUPABASE_KEY3}
     ports:
       - "8003:8000"
     depends_on:
@@ -80,6 +86,8 @@ services:
       context: ./app/security-dashboard-service
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL3}
+      - SUPABASE_KEY=${SUPABASE_KEY3}
     ports:
       - "8004:8000"
     depends_on:
@@ -118,6 +126,8 @@ services:
       context: ./app/attendance
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL1}
+      - SUPABASE_KEY=${SUPABASE_KEY1}
     ports:
       - "8006:8000" # Map host port 8006 to container port 4000
     depends_on:
@@ -130,6 +140,8 @@ services:
       context: ./app/schedule-manager
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL1}
+      - SUPABASE_KEY=${SUPABASE_KEY1}
     ports:
       - "8008:8000" # Map host port 8008 to container port 8000
     depends_on:
