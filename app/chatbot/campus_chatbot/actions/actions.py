@@ -38,10 +38,18 @@ from decouple import config
 
 API_URL = config('API_BASE_URL')
 
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host="db.fbpgrmhqzlobmtmpprvj.supabase.co",
+#         port=5432,
+#         database="postgres",
+#         user="postgres",
+#         password="PpUxvZcvRe7yskSA"
+#     )
 def get_db_connection():
     return psycopg2.connect(
         host="db.fbpgrmhqzlobmtmpprvj.supabase.co",
-        port=5432,
+        port=8000,
         database="postgres",
         user="postgres",
         password="PpUxvZcvRe7yskSA"

@@ -223,7 +223,7 @@ def get_all_exams():
     response = supabase.table("Exams").select("*").execute()
     return response.data
 
-def update_exam(exam_id: str, update_data: dict):
+async def update_exam(exam_id: str, update_data: dict):
     try:
         print("Update data:", update_data)
         updated_data = serialize_exam_data(update_data)
@@ -232,6 +232,51 @@ def update_exam(exam_id: str, update_data: dict):
         response = supabase.table("Exams").update(updated_data).eq("exam_id", exam_id).execute()
         
         if response.data:
+
+            # get course_code and course_name using exam_id
+            course_code = (
+                supabase
+                .from_("Exams")
+                .select("course_code")
+                .eq("exam_id", exam_id)
+                .single()
+                .execute()
+            ).data["course_code"]
+            
+            course_name = (
+                supabase
+                .from_("Courses")
+                .select("course_name")
+                .eq("course_code", course_code)
+                .single()
+                .execute()
+            ).data["course_name"]
+
+            # get sender_id using course_code
+            sender_id = (
+                supabase
+                .from_("Assigned")
+                .select("reg_number")
+                .eq("course_code", course_code)
+                .execute()
+            ).data[0]["reg_number"]
+
+            # send notification to rabbitMQ
+            response_from_notifications = await publish_message_with_reply(
+                COURSES_NOTIFICATIONS_QUEUE,
+                {
+                    "action": "addCourseNotification",
+                    "payload": {
+                        "sender_id": sender_id,
+                        "course_id": course_code,
+                        "title": "Update in Exam Schedule",
+                        "message": f"You have been successfully enrolled in the course {course_code} - {course_name}.",
+                }
+                }
+            )
+            print(f"Response from notifications service: {response_from_notifications}")
+
+
             return response.data
         return None
     
