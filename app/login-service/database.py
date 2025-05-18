@@ -11,17 +11,20 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Get Supabase credentials
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-if not supabase_url or not supabase_key:
+print("Supabase URL:", SUPABASE_URL)
+print("Supabase Key:", SUPABASE_KEY)
+
+if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in .env file")
 
-logger.info(f"Initializing Supabase client with URL: {supabase_url}")
+logger.info(f"Initializing Supabase client with URL: {SUPABASE_URL}")
 
 # Initialize Supabase client
 try:
-    supabase = create_client(supabase_url, supabase_key)
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     logger.info("Supabase client initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Supabase client: {str(e)}")

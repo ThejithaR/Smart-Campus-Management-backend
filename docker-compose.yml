@@ -32,6 +32,11 @@ services:
       context: ./app/login-service
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL4}
+      - SUPABASE_KEY=${SUPABASE_KEY4}
+      - SECRET_KEY=${SECRET_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} 
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     ports:
       - "8100:8000"  # Using port 8009 for the login service
     depends_on:
