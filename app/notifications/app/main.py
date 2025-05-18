@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 import asyncio
-from app.rabbitMQ.apiGatewayConsumer import consume_gateway_messages
-from app.rabbitMQ.coursesConsumer import consume_courses_messages
-from app.rabbitMQ.schedulingConsumer import consume_scheduling_messages
+from .rabbitMQ.apiGatewayConsumer import consume_gateway_messages
+from .rabbitMQ.coursesConsumer import consume_courses_messages
+from .rabbitMQ.schedulingConsumer import consume_scheduling_messages
 
 app = FastAPI()
 
