@@ -21,6 +21,9 @@ RUN pip install --upgrade pip && \
 # Copy the rest of the application code
 COPY . .
 
+# Train the Rasa model during the build
+RUN rasa train
+
 # Expose the port the chatbot server will run on
 EXPOSE 8000
 

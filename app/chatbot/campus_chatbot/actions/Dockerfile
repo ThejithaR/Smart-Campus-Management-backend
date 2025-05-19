@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8000
 
 # Command to run the action server
-CMD ["rasa", "run", "actions", "--debug"]
+CMD ["rasa", "run", "actions","--port", "8000", "--debug"]

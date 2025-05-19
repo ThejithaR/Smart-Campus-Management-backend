@@ -1,10 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"   # RabbitMQ default port
+      - "5672:5672" # RabbitMQ default port
       - "15672:15672" # RabbitMQ management UI
     networks:
       - smart-campus-network
@@ -18,7 +18,7 @@ services:
     build:
       context: ./app/api-gateway
     environment:
-      - RABBITMQ_HOST=rabbitmq 
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - "8000:8000" # Map host port 8009 to container port 8000 (assuming internal port is 8000)
     depends_on:
@@ -27,7 +27,7 @@ services:
     networks:
       - smart-campus-network
 
-  login-service:  # Added login service
+  login-service: # Added login service
     build:
       context: ./app/login-service
     environment:
@@ -35,17 +35,17 @@ services:
       - SUPABASE_URL=${SUPABASE_URL4}
       - SUPABASE_KEY=${SUPABASE_KEY4}
       - SECRET_KEY=${SECRET_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} 
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     ports:
-      - "8100:8000"  # Using port 8009 for the login service
+      - "8100:8000" # Using port 8009 for the login service
     depends_on:
       - rabbitmq
     networks:
       - smart-campus-network
 
   vehicle-detector:
-    build: 
+    build:
       context: ./app/vehicle-detector
     environment:
       - RABBITMQ_HOST=rabbitmq
@@ -59,7 +59,7 @@ services:
       - smart-campus-network
 
   authorization-service:
-    build: 
+    build:
       context: ./app/authorization-service
     environment:
       - RABBITMQ_HOST=rabbitmq
@@ -73,7 +73,7 @@ services:
       - smart-campus-network
 
   logger-service:
-    build: 
+    build:
       context: ./app/logger-service
     environment:
       - RABBITMQ_HOST=rabbitmq
@@ -87,7 +87,7 @@ services:
       - smart-campus-network
 
   security-dashboard-service:
-    build: 
+    build:
       context: ./app/security-dashboard-service
     environment:
       - RABBITMQ_HOST=rabbitmq
@@ -101,7 +101,7 @@ services:
       - smart-campus-network
 
   course-enrollment:
-    build: 
+    build:
       context: ./app/course-enrollment
     environment:
       - RABBITMQ_HOST=rabbitmq
@@ -121,7 +121,7 @@ services:
       - "8007:8000" # Map host port 8007 to container port 8000
     depends_on:
       rabbitmq:
-        condition: service_healthy  # Add this line
+        condition: service_healthy # Add this line
 
     networks:
       - smart-campus-network
@@ -161,6 +161,54 @@ services:
       - RABBITMQ_HOST=rabbitmq # Include RabbitMQ host if needed
     ports:
       - "8010:8000" # Map host port 8010 to container port 8000
+    depends_on:
+      - rabbitmq # Depends on rabbitmq
+    networks:
+      - smart-campus-network
+
+  chatbot-backend: # Add the new chatbot service
+    build:
+      context: ./app/chatbot/backend
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL1}
+      - SUPABASE_KEY=${SUPABASE_KEY1}
+      - DB_HOST=${DB_HOST1}
+      - DB_PORT=${DB_PORT1}
+      - DB_USER=${DB_USER1}
+      - DB_PASSWORD=${DB_PASSWORD1}
+      - DB_DATABASE=${DB_DATABASE1}
+    ports:
+      - "8012:8000" # Map host port 8011 to container port 8000
+    depends_on:
+      - rabbitmq # Depends on rabbitmq
+    networks:
+      - smart-campus-network
+
+  chatbot-actions: # Add the new chatbot service
+    build:
+      context: ./app/chatbot/campus_chatbot/actions
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL1}
+      - SUPABASE_KEY=${SUPABASE_KEY1}
+      - SCHEDULER_BASE_URL=${SCHEDULER_BASE_URL1}
+    ports:
+      - "8014:8000" # Map host port 8012 to container port 8000
+    depends_on:
+      - rabbitmq # Depends on rabbitmq
+    networks:
+      - smart-campus-network
+
+  chatbot-service: # Add the new chatbot service
+    build:
+      context: ./app/chatbot/campus_chatbot
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - SUPABASE_URL=${SUPABASE_URL1}
+      - SUPABASE_KEY=${SUPABASE_KEY1}
+    ports:
+      - "8016:8000" # Map host port 8013 to container port 8000
     depends_on:
       - rabbitmq # Depends on rabbitmq
     networks:

@@ -34,9 +34,15 @@ import re
 import uuid
 from typing import Any, Text, Dict, List
 import requests
+from dotenv import load_dotenv
 from decouple import config
 
-API_URL = config('API_BASE_URL')
+# Load environment variables from .env file
+load_dotenv()
+
+API_URL = os.getenv("SCHEDULER_BASE_URL")
+
+# API_URL = config('API_BASE_URL')
 
 # def get_db_connection():
 #     return psycopg2.connect(
